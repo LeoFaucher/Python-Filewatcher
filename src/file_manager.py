@@ -1,5 +1,8 @@
 import os
 import hashlib
+import datetime
+
+from src.database.connection import add_directory
 
 """
 Function to manage all the reading of folder and files for the monitoring 
@@ -14,14 +17,13 @@ def reading_folder():
     return f_list
 
 
-def get_sha():
+def save_directory():
     list_ = reading_folder()
+    print(list_)
     for file in list_:
-        print(file)
-        print(sha256.hexdigest())
+        add_directory(datetime.datetime.now(), file, sha256.hexdigest)
         sha_list.append(file.sha256.hexdigest())
-    print(sha_list)
     return sha_list
 
 
-get_sha()
+save_directory()
