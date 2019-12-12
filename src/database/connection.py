@@ -23,7 +23,7 @@ def create_table():
     cursor = c.cursor()
     # Query to create a table in the database
     sqlite_create_table_query = '''CREATE TABLE directory
-                                            (name text, date current_date , signature text, modifiedDate timestamp);'''
+                                    (fileName text, date current_date , signature text, modifiedDate timestamp);'''
     # Execute the create table query
     # And create a database named "directory"
     cursor.execute(sqlite_create_table_query)
@@ -34,7 +34,7 @@ Function to add a new record in the directory table
 """
 
 
-def add_directory(date, name, signature):
+def add_directory(date, filename, signature):
     try:
         # Connect to the database
         c = connect_to_database()
@@ -42,11 +42,11 @@ def add_directory(date, name, signature):
 
         # Query to insert details in directory table
         sqlite_insert_with_param = """INSERT INTO 'directory'
-                                        ('date', 'name', 'signature') 
+                                        ('date', 'fileName', 'signature') 
                                         VALUES (?, ?, ?);"""
 
         # Save in a tuple the data coming from the parameter
-        data_tuple = (date, name, signature)
+        data_tuple = (date, filename, signature)
 
         # Execute the insert query
         # And create a new record in the directory table
@@ -56,10 +56,23 @@ def add_directory(date, name, signature):
         c.commit()
         print("New record added successfully \n")
 
-        # Query to get directory details
-        sqlite_select_query = """SELECT name, date, signature FROM directory WHERE name = ?"""
+    except sqlite3.Error as error:
+        print("Error while processing with SQLite", error)
+    finally:
+        if (c):
+            c.close()
+            print("SQLite connection is closed")
 
-        cursor.execute(sqlite_select_query, ("YYYYRRRRMMMMM",))
+
+def get_directory(name):
+    try:
+        # Connect to the database
+        c = connect_to_database()
+        cursor = c.cursor()
+
+        # Query to get directory details
+        sqlite_select_query = """SELECT name, date, signature FROM directory WHERE fileName = ?"""
+        cursor.execute(sqlite_select_query, (name,))
         records = cursor.fetchall()
         print(records)
 
@@ -74,6 +87,7 @@ def add_directory(date, name, signature):
 
     except sqlite3.Error as error:
         print("Error while processing with SQLite", error)
+
     finally:
         if (c):
             c.close()
